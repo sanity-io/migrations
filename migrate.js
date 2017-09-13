@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const client = require('part:@sanity/base/client').default
 const reduce = require('json-reduce').default
 
