@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 require('@sanity/plugin-loader/register')
-const client = require('part:@sanity/base/client').default
+const client = require('part:@sanity/base/client')
 const reduce = require('json-reduce').default
 
 function fetchAllDocuments() {
@@ -33,5 +33,5 @@ fetchAllDocuments()
   .then(documents => documents.map(generatePatchesForDocument).filter(Boolean))
   .then(commit)
   .then(res => {
-    console.log('✅ Migrated %d documents in transaction %s', res.documentIds.length, res.transactionId)
+    console.log('✅  Migrated %d documents in transaction %s', res.documentIds.length, res.transactionId)
   })
