@@ -1,19 +1,26 @@
 #!/usr/bin/env node
-require('@sanity/plugin-loader/register')
 const fs = require('fs')
 const path = require('path')
-const client = require('part:@sanity/base/client')
+const createClient = require('@sanity/client')
 const reduce = require('json-reduce').default
 const inquirer = require('inquirer')
 
+
 let sanityConfig
+let client
 try {
   sanityConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'sanity.json')).toString())
 } catch (error) {
-  console.error('Could not read sanity config from current working directory. Make sure you have a sanity.json')
-  console.error(error)
+  console.error('Could not read sanity config from current working directory. Make sure you have a sanity.json.\nError was %s', error.message)
   process.exit(1)
 }
+
+client = createClient({
+  projectId: sanityConfig.api.projectId,
+  dataset: sanityConfig.api.dataset,
+  useCdn: false
+})
+
 function fetchAllDocuments() {
   return client.fetch('*[!(_id in path("_.**"))][0...10000] {...}')
 }
@@ -54,6 +61,7 @@ function confirm(patches) {
   return inquirer.prompt([{
     name: 'continue',
     type: 'confirm',
+    default: false,
     message: `The following operations will be performed:\n\n${summary.join('\n')}\n\nWould you like to continue?`
   }])
     .then(result => {
