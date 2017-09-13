@@ -42,15 +42,14 @@ function commit(patches, token) {
 }
 
 function confirm(patches) {
+  if (patches.length === 0) {
+    return {noop: true}
+  }
   const summary = patches.reduce((summary, patch) => {
     return summary.concat(`️📃  On document: ${patch.document._id}`).concat(
       Object.keys(patch.set).map(path => `    ✏  SET ${path} = ${patch.set[path]}`)
     )
   }, [])
-
-  if (summary.length === 0) {
-    return {continue: false}
-  }
 
   return inquirer.prompt([{
     name: 'continue',
@@ -79,6 +78,9 @@ function run() {
     .then(documents => documents.map(generatePatchesForDocument).filter(Boolean))
     .then(confirm)
     .then(result => {
+      if (result.noop) {
+        return {success: true, noop: true}
+      }
       if (result.continue) {
         return getToken().then(token => commit(result.patches, token).then(res => {
           return {success: true, transactionId: res.transactionId, documentIds: res.documentIds}
@@ -87,11 +89,14 @@ function run() {
       return {success: false, cancelled: true}
     })
     .then(res => {
-      if (res.cancelled) {
+      if (res.noop) {
+        console.log('Nothing to do.')
+      }
+      else if (res.cancelled) {
         console.log('Cancelled.')
       }
       else {
-        console.log('✅  Migrated %d documents in transaction %s', res.documentIds.length, res.transactionId)
+        console.log('✅  Migrated %d documents in transaction %s.', res.documentIds.length, res.transactionId)
       }
     })
     .catch(error => {
