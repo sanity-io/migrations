@@ -25,8 +25,8 @@ function fetchAllDocuments(client) {
 function generatePatchesForDocument(document) {
   const patches = reduce(document, (acc, value, keyPath) => {
     const key = keyPath[keyPath.length - 1]
-    return (key === '_type' && value === 'richDate')
-      ? Object.assign({}, acc, {[keyPath.join('.')]: 'date'})
+    return (key === '_type' && value === 'date')
+      ? Object.assign({}, acc, {[keyPath.join('.')]: 'richDate'})
       : acc
   }, {})
 
