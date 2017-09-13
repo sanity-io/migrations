@@ -22,7 +22,7 @@ client = createClient({
 })
 
 function fetchAllDocuments() {
-  return client.fetch('*[!(_id in path("_.**"))][0...10000]')
+  return client.fetch('*[!(_id in path("_.**"))][0...1000000]')
 }
 
 function generatePatchesForDocument(document) {
