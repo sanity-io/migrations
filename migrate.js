@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+"use strict"
 const fs = require('fs')
 const path = require('path')
 const createClient = require('@sanity/client')
@@ -21,7 +22,7 @@ client = createClient({
 })
 
 function fetchAllDocuments() {
-  return client.fetch('*[!(_id in path("_.**"))][0...10000] {...}')
+  return client.fetch('*[!(_id in path("_.**"))][0...10000]')
 }
 
 function generatePatchesForDocument(document) {
@@ -63,12 +64,7 @@ function confirm(patches) {
     default: false,
     message: `The following operations will be performed:\n\n${summary.join('\n')}\n\nWould you like to continue?`
   }])
-    .then(result => {
-      return {
-        ...result,
-        patches
-      }
-    })
+    .then(result => Object.assign({}, result, {patches}))
 }
 
 function getToken() {
