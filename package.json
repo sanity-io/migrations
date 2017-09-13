@@ -1,0 +1,8 @@
+{
+  "name": "migrate-date",
+  "version": "0.0.0",
+  "bin": "./migrate.js",
+  "dependencies": {
+    "json-reduce": "1.0.0"
+  }
+}
