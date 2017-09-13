@@ -5,6 +5,7 @@
   "dependencies": {
     "@sanity/client": "0.111.2",
     "json-reduce": "1.0.0",
-    "inquirer": "^3.2.3"
+    "inquirer": "^3.2.3",
+    "configstore": "^3.1.1"
   }
 }
