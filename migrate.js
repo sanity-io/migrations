@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+require('@sanity/plugin-loader/register')
 const client = require('part:@sanity/base/client').default
 const reduce = require('json-reduce').default
 

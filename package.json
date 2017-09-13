@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "bin": "./migrate.js",
   "dependencies": {
+    "@sanity/plugin-loader": "0.111.2",
     "json-reduce": "1.0.0"
   }
 }
