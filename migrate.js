@@ -71,6 +71,7 @@ function getToken() {
     type: 'password',
     message: `Please enter a token with write access on project ${sanityConfig.api.projectId}`
   }])
+    .then(result => result.token)
 }
 
 function run() {
