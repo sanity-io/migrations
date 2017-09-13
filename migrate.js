@@ -5,7 +5,6 @@ const createClient = require('@sanity/client')
 const reduce = require('json-reduce').default
 const inquirer = require('inquirer')
 
-
 let sanityConfig
 let client
 try {
