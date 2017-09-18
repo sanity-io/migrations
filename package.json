@@ -1,11 +1,26 @@
 {
   "name": "migrate-date",
+  "description": "A collection of migration scripts",
+  "private": true,
   "version": "0.0.0",
-  "bin": "./migrate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "@sanity/client": "0.111.2",
     "json-reduce": "1.0.0",
     "inquirer": "^3.2.3",
     "configstore": "^3.1.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanity-io/migrations.git"
+  },
+  "keywords": [],
+  "author": "Sanity.io <hello@sanity.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sanity-io/migrations/issues"
+  },
+  "homepage": "https://github.com/sanity-io/migrations#readme"
 }
