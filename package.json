@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "date-to-richdate": "./date-to-richdate.js"
+  },
   "dependencies": {
     "@sanity/client": "0.111.2",
     "json-reduce": "1.0.0",
