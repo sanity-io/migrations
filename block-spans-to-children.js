@@ -13,7 +13,7 @@ const get = require('lodash/get')
 const isPlainObject = require('lodash/isPlainObject')
 const reduce = require('json-reduce').default
 
-const knownSpanKeys = ['_type', '_key', 'text', 'marks']
+const knownSpanKeys = ['_type', '_key', 'text']
 const keysSeen = new Set()
 let tieBreaker = 0
 
@@ -155,9 +155,19 @@ function migrateSpans(spans) {
   const children = spans
     .map(span => {
       return Object.keys(span).reduce((child, key) => {
+        if (key === 'marks') {
+          return child
+        }
+
         const knownKey = knownSpanKeys.includes(key)
         if (knownKey || !isPlainObject(span[key])) {
           child[key] = span[key]
+          return child
+        }
+
+        // Only include "marks" that actually has content
+        const hasContent = Object.keys(span[key]).length > 0
+        if (!hasContent) {
           return child
         }
 
@@ -175,7 +185,7 @@ function migrateSpans(spans) {
         }
 
         return child
-      }, {})
+      }, {marks: span.marks || []})
     })
     .map(child => {
       if (!child._key) {
