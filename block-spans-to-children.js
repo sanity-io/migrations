@@ -30,6 +30,10 @@ try {
   process.exit(1)
 }
 
+const datasetIndex = process.argv.indexOf('--dataset') + 1
+const dataset = datasetIndex && process.argv[datasetIndex]
+const targetDataset = dataset ? dataset : sanityConfig.api.dataset
+
 function fetchAllDocuments(client) {
   return client.fetch('*[!(_id in path("_.**"))][0...1000000]')
 }
@@ -57,8 +61,7 @@ function promptBackup() {
       name: 'continue',
       type: 'confirm',
       default: false,
-      message: `Before doing this migration, make sure you have a backup handy.\n  "sanity dataset export <dataset> <somefile.ndjson>" is an easy way to do this.\n\nWould you like to perform the migration on dataset "${sanityConfig
-        .api.dataset}"?`
+      message: `Before doing this migration, make sure you have a backup handy.\n  "sanity dataset export <dataset> <somefile.ndjson>" is an easy way to do this.\n\nWould you like to perform the migration on dataset "${targetDataset}"?`
     }
   ])
 }
@@ -109,7 +112,7 @@ function getClient() {
   return getToken().then(token =>
     createClient({
       projectId: sanityConfig.api.projectId,
-      dataset: sanityConfig.api.dataset,
+      dataset: targetDataset,
       useCdn: false,
       token
     })
