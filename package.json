@@ -1,5 +1,5 @@
 {
-  "name": "migrate-date",
+  "name": "@sanity/migrations",
   "description": "A collection of migration scripts",
   "private": true,
   "version": "0.0.0",
@@ -7,13 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "date-to-richdate": "./date-to-richdate.js"
+    "date-to-richdate": "./date-to-richdate.js",
+    "block-spans-to-children": "./block-spans-to-childen.js"
   },
   "dependencies": {
     "@sanity/client": "0.111.2",
-    "json-reduce": "1.0.0",
+    "configstore": "^3.1.1",
     "inquirer": "^3.2.3",
-    "configstore": "^3.1.1"
+    "json-reduce": "1.0.0",
+    "lodash": "^4.17.4"
   },
   "repository": {
     "type": "git",

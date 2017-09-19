@@ -9,9 +9,10 @@ npx sanity-io/migrations <migration>
 
 E.g:
 ```
-npx sanity-io/migrations date-to-richdate 
+npx sanity-io/migrations date-to-richdate
 ```
 
 ## Supported migrations
 
 - `date-to-richdate` - More info at https://sanity.io/help/migrate-to-rich-date
+- `block-spans-to-children` - More info at https://sanity.io/help/migrate-to-block-children
