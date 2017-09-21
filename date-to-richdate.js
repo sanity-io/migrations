@@ -100,7 +100,7 @@ function getToken() {
 function getClient() {
   return getToken().then(token => createClient({
     projectId: sanityConfig.api.projectId,
-    dataset: sanityConfig.api.dataset,
+    dataset: targetDataset,
     useCdn: false,
     token
   }))
