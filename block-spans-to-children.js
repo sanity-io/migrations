@@ -35,7 +35,7 @@ const dataset = datasetIndex && process.argv[datasetIndex]
 const targetDataset = dataset ? dataset : sanityConfig.api.dataset
 
 function fetchAllDocuments(client) {
-  return client.fetch('*[!(_id in path("_.**"))][0...1000000]')
+  return client.fetch('* | order(_id) [0...1000000]')
 }
 
 function generatePatchesForDocument(document) {
