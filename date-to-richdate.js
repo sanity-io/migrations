@@ -17,6 +17,20 @@ try {
   console.error('Could not read sanity config from current working directory. Make sure you have a sanity.json.\nError was %s', error.message)
   process.exit(1)
 }
+const datasetIndex = process.argv.indexOf('--dataset') + 1
+const dataset = datasetIndex && process.argv[datasetIndex]
+const targetDataset = dataset ? dataset : sanityConfig.api.dataset
+
+function promptBackup() {
+  return inquirer.prompt([
+    {
+      name: 'continue',
+      type: 'confirm',
+      default: false,
+      message: `Migrating from date to richDate.\n\nBefore doing this migration, make sure you have a backup handy.\n  "sanity dataset export <dataset> <somefile.ndjson>" is an easy way to do this.\n\nWould you like to perform the "date => richDate"-migration on dataset "${targetDataset}"?`
+    }
+  ])
+}
 
 function fetchAllDocuments(client) {
   return client.fetch('*[!(_id in path("_.**"))][0...1000000]')
@@ -123,4 +137,4 @@ function run() {
   })
 }
 
-run()
+promptBackup().then(run)

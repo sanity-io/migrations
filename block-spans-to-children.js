@@ -61,7 +61,7 @@ function promptBackup() {
       name: 'continue',
       type: 'confirm',
       default: false,
-      message: `Before doing this migration, make sure you have a backup handy.\n  "sanity dataset export <dataset> <somefile.ndjson>" is an easy way to do this.\n\nWould you like to perform the migration on dataset "${targetDataset}"?`
+      message: `Migrating from block spans to children.\n\nBefore doing this migration, make sure you have a backup handy.\n  "sanity dataset export <dataset> <somefile.ndjson>" is an easy way to do this.\n\nWould you like to perform the "block spans to children"-migration on dataset "${targetDataset}"?`
     }
   ])
 }
