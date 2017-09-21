@@ -4,12 +4,12 @@
 1. Make sure you have `npx` installed (if you have `npm` version 5.2.0 or later, it is already installed)
 2. Run the migration with
 ```
-npx sanity-io/migrations <migration>
+npx -p sanity-io/migrations <migration>
 ```
 
 E.g:
 ```
-npx sanity-io/migrations date-to-richdate
+npx -p sanity-io/migrations date-to-richdate
 ```
 
 ## Supported migrations
