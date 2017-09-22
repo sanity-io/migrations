@@ -12,6 +12,7 @@ const ConfigStore = require('configstore')
 const get = require('lodash/get')
 const isPlainObject = require('lodash/isPlainObject')
 const reduce = require('json-reduce').default
+const fetchAllDocuments = require('./fetchAllDocuments')
 
 const knownSpanKeys = ['_type', '_key', 'text']
 const keysSeen = new Set()
@@ -33,10 +34,6 @@ try {
 const datasetIndex = process.argv.indexOf('--dataset') + 1
 const dataset = datasetIndex && process.argv[datasetIndex]
 const targetDataset = dataset ? dataset : sanityConfig.api.dataset
-
-function fetchAllDocuments(client) {
-  return client.fetch('* | order(_id) [0...1000000]')
-}
 
 function generatePatchesForDocument(document) {
   const result = createPatchesForDocument(document)
@@ -157,38 +154,41 @@ function migrateSpans(spans) {
   const markDefs = []
   const children = spans
     .map(span => {
-      return Object.keys(span).reduce((child, key) => {
-        if (key === 'marks') {
+      return Object.keys(span).reduce(
+        (child, key) => {
+          if (key === 'marks') {
+            return child
+          }
+
+          const knownKey = knownSpanKeys.includes(key)
+          if (knownKey || !isPlainObject(span[key])) {
+            child[key] = span[key]
+            return child
+          }
+
+          // Only include "marks" that actually has content
+          const hasContent = Object.keys(span[key]).length > 0
+          if (!hasContent) {
+            return child
+          }
+
+          // Treat unknown keys as "custom" marks
+          const markKey = generateKey(span[key])
+          child.marks = [markKey].concat(span.marks)
+
+          if (!markDefs.find(item => item._key === markKey)) {
+            markDefs.push(
+              Object.assign({}, span[key], {
+                _type: key,
+                _key: markKey
+              })
+            )
+          }
+
           return child
-        }
-
-        const knownKey = knownSpanKeys.includes(key)
-        if (knownKey || !isPlainObject(span[key])) {
-          child[key] = span[key]
-          return child
-        }
-
-        // Only include "marks" that actually has content
-        const hasContent = Object.keys(span[key]).length > 0
-        if (!hasContent) {
-          return child
-        }
-
-        // Treat unknown keys as "custom" marks
-        const markKey = generateKey(span[key])
-        child.marks = [markKey].concat(span.marks)
-
-        if (!markDefs.find(item => item._key === markKey)) {
-          markDefs.push(
-            Object.assign({}, span[key], {
-              _type: key,
-              _key: markKey
-            })
-          )
-        }
-
-        return child
-      }, {marks: span.marks || []})
+        },
+        {marks: span.marks || []}
+      )
     })
     .map(child => {
       if (!child._key) {

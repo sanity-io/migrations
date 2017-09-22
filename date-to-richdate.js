@@ -9,12 +9,18 @@ const createClient = require('@sanity/client')
 const reduce = require('json-reduce').default
 const inquirer = require('inquirer')
 const ConfigStore = require('configstore')
+const fetchAllDocuments = require('./fetchAllDocuments')
 
 let sanityConfig
 try {
-  sanityConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'sanity.json')).toString())
+  sanityConfig = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), 'sanity.json')).toString()
+  )
 } catch (error) {
-  console.error('Could not read sanity config from current working directory. Make sure you have a sanity.json.\nError was %s', error.message)
+  console.error(
+    'Could not read sanity config from current working directory. Make sure you have a sanity.json.\nError was %s',
+    error.message
+  )
   process.exit(1)
 }
 const datasetIndex = process.argv.indexOf('--dataset') + 1
@@ -32,29 +38,32 @@ function promptBackup() {
   ])
 }
 
-function fetchAllDocuments(client) {
-  return client.fetch('* | order(_id) [0...1000000]')
-}
-
 function generatePatchesForDocument(document) {
-  const patches = reduce(document, (acc, value, keyPath) => {
-    const key = keyPath[keyPath.length - 1]
-    return (key === '_type' && value === 'date')
-      ? Object.assign({}, acc, {[keyPath.join('.')]: 'richDate'})
-      : acc
-  }, {})
-
-  return (Object.keys(patches).length === 0) ? null : {
+  const patches = reduce(
     document,
-    set: patches
-  }
+    (acc, value, keyPath) => {
+      const key = keyPath[keyPath.length - 1]
+      return key === '_type' && value === 'date'
+        ? Object.assign({}, acc, {[keyPath.join('.')]: 'richDate'})
+        : acc
+    },
+    {}
+  )
+
+  return Object.keys(patches).length === 0
+    ? null
+    : {
+        document,
+        set: patches
+      }
 }
 
 function commit(patches, client) {
-  return patches.reduce(
-    (tx, patch) => tx.patch(patch.document._id, {set: patch.set}),
-    client.transaction()
-  )
+  return patches
+    .reduce(
+      (tx, patch) => tx.patch(patch.document._id, {set: patch.set}),
+      client.transaction()
+    )
     .commit()
 }
 
@@ -65,51 +74,66 @@ function confirm(patches) {
   const summary = patches.reduce((acc, patch) => {
     return acc
       .concat(`️📃  On document: ${patch.document._id}`)
-      .concat(Object.keys(patch.set).map(keyPath => `    ✏  SET ${keyPath} = ${patch.set[keyPath]}\n`))
+      .concat(
+        Object.keys(patch.set).map(
+          keyPath => `    ✏  SET ${keyPath} = ${patch.set[keyPath]}\n`
+        )
+      )
       .concat(' ')
   }, [])
 
-  return inquirer.prompt([{
-    name: 'continue',
-    type: 'confirm',
-    default: false,
-    message: `The following operations will be performed:\n \n${summary.join('\n')}\n\nWould you like to continue?`
-  }])
+  return inquirer
+    .prompt([
+      {
+        name: 'continue',
+        type: 'confirm',
+        default: false,
+        message: `The following operations will be performed:\n \n${summary.join(
+          '\n'
+        )}\n\nWould you like to continue?`
+      }
+    ])
     .then(result => Object.assign({}, result, {patches}))
 }
 
 function getToken() {
-  const authToken = new ConfigStore(
-    'sanity',
-    {},
-    {globalConfigPath: true}
-  ).get('authToken')
+  const authToken = new ConfigStore('sanity', {}, {globalConfigPath: true}).get(
+    'authToken'
+  )
 
   if (authToken) {
     return Promise.resolve(authToken)
   }
 
-  return inquirer.prompt([{
-    name: 'token',
-    type: 'password',
-    message: `Please enter a token with write access on project ${sanityConfig.api.projectId}`
-  }])
+  return inquirer
+    .prompt([
+      {
+        name: 'token',
+        type: 'password',
+        message: `Please enter a token with write access on project ${sanityConfig
+          .api.projectId}`
+      }
+    ])
     .then(result => result.token)
 }
 
 function getClient() {
-  return getToken().then(token => createClient({
-    projectId: sanityConfig.api.projectId,
-    dataset: targetDataset,
-    useCdn: false,
-    token
-  }))
+  return getToken().then(token =>
+    createClient({
+      projectId: sanityConfig.api.projectId,
+      dataset: targetDataset,
+      useCdn: false,
+      token
+    })
+  )
 }
 
 function run() {
   getClient().then(client => {
     return fetchAllDocuments(client)
-      .then(documents => documents.map(generatePatchesForDocument).filter(Boolean))
+      .then(documents =>
+        documents.map(generatePatchesForDocument).filter(Boolean)
+      )
       .then(confirm)
       .then(result => {
         if (result.noop) {
@@ -117,7 +141,11 @@ function run() {
         }
         if (result.continue) {
           return commit(result.patches, client).then(res => {
-            return {success: true, transactionId: res.transactionId, documentIds: res.documentIds}
+            return {
+              success: true,
+              transactionId: res.transactionId,
+              documentIds: res.documentIds
+            }
           })
         }
         return {success: false, cancelled: true}
@@ -128,7 +156,11 @@ function run() {
         } else if (res.cancelled) {
           console.log('\nCancelled.\n')
         } else {
-          console.log('\n✅  Migrated %d documents in transaction %s.\n', res.documentIds.length, res.transactionId)
+          console.log(
+            '\n✅  Migrated %d documents in transaction %s.\n',
+            res.documentIds.length,
+            res.transactionId
+          )
         }
       })
       .catch(error => {

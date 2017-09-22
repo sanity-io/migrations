@@ -6,12 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": ">=7.6.0"
+  },
   "bin": {
     "date-to-richdate": "./date-to-richdate.js",
     "block-spans-to-children": "./block-spans-to-children.js"
   },
   "dependencies": {
-    "@sanity/client": "0.111.2",
+    "@sanity/client": "^0.113.0",
     "configstore": "^3.1.1",
     "inquirer": "^3.2.3",
     "json-reduce": "1.0.0",
@@ -27,5 +30,8 @@
   "bugs": {
     "url": "https://github.com/sanity-io/migrations/issues"
   },
-  "homepage": "https://github.com/sanity-io/migrations#readme"
+  "homepage": "https://github.com/sanity-io/migrations#readme",
+  "devDependencies": {
+    "prettier": "^1.7.0"
+  }
 }
