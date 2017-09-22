@@ -44,7 +44,7 @@ function generatePatchesForDocument(document) {
     (acc, value, keyPath) => {
       const key = keyPath[keyPath.length - 1]
       return key === '_type' && value === 'date'
-        ? Object.assign({}, acc, {[keyPath.join('.')]: 'richDate'})
+        ? Object.assign({}, acc, {[serializePath(keyPath)]: 'richDate'})
         : acc
     },
     {}
@@ -56,6 +56,15 @@ function generatePatchesForDocument(document) {
         document,
         set: patches
       }
+}
+
+function serializePath(path) {
+  return path.reduce((target, part, i) => {
+    const isIndex = typeof part === 'number'
+    const seperator = i === 0 ? '' : '.'
+    const add = isIndex ? `[${part}]` : `${seperator}${part}`
+    return `${target}${add}`
+  }, '')
 }
 
 function commit(patches, client) {
