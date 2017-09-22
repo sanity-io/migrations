@@ -225,6 +225,7 @@ function run() {
     })
     .then(getClient)
     .then(client => {
+      console.log('Fetching documents...')
       return fetchAllDocuments(client)
         .then(documents =>
           documents.map(generatePatchesForDocument).filter(Boolean)
