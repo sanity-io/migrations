@@ -11,7 +11,8 @@
   },
   "bin": {
     "date-to-richdate": "./date-to-richdate.js",
-    "block-spans-to-children": "./block-spans-to-children.js"
+    "block-spans-to-children": "./block-spans-to-children.js",
+    "fix-draft-refs": "./fix-draft-refs.js"
   },
   "dependencies": {
     "@sanity/client": "^0.113.0",

@@ -16,3 +16,4 @@ npx -p sanity-io/migrations date-to-richdate
 
 - `date-to-richdate` - More info at https://sanity.io/help/migrate-to-rich-date
 - `block-spans-to-children` - More info at https://sanity.io/help/migrate-to-block-children
+- `fix-draft-refs` - Repairs all references to draft documents with references to the published version
