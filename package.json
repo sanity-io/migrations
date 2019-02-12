@@ -15,11 +15,11 @@
     "fix-draft-refs": "./fix-draft-refs.js"
   },
   "dependencies": {
-    "@sanity/client": "^0.113.0",
-    "configstore": "^3.1.1",
-    "inquirer": "^3.2.3",
+    "@sanity/client": "^0.140.7",
+    "configstore": "^4.0.0",
+    "inquirer": "^6.2.2",
     "json-reduce": "1.0.0",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.11"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,6 @@
   },
   "homepage": "https://github.com/sanity-io/migrations#readme",
   "devDependencies": {
-    "prettier": "^1.7.0"
+    "prettier": "^1.16.4"
   }
 }
