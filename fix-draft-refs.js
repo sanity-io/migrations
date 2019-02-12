@@ -93,17 +93,16 @@ const getDocsWithPublishFlag = (allDocs, docsWithBadRefs) => {
           const published = allDocsById[getPublishedId(referencedDocId)]
           const draft = allDocsById[getDraftId(referencedDocId)]
 
-          return {
-            needsPublish: !published,
-            document: {
-              ...draft,
-              _id: getPublishedId(badRef.fixed._ref),
-            },
-          }
+          return published
+            ? null
+            : {
+                ...draft,
+                _id: getPublishedId(badRef.fixed._ref),
+              }
         }),
       ),
-    ).filter(doc => doc.needsPublish),
-    placeholder => placeholder.document._id,
+    ).filter(Boolean),
+    placeholder => placeholder._id,
   )
 }
 const getSetPatches = docsWithBadRefs => {
@@ -130,9 +129,9 @@ function serializePath(path) {
   }, '')
 }
 
-function commit(placeholders, setPatches, client) {
+function commit(needsPublish, setPatches, client) {
   let tx = client.transaction()
-  tx = placeholders.reduce((tx, placeholder) => tx.createIfNotExists(placeholder.document), tx)
+  tx = needsPublish.reduce((tx, doc) => tx.createIfNotExists(doc), tx)
   tx = setPatches.reduce(
     (tx, setPatch) => tx.patch(setPatch.document._id, { set: setPatch.set }),
     tx,
@@ -140,13 +139,12 @@ function commit(placeholders, setPatches, client) {
   return tx.commit()
 }
 
-function createSummary(placeholders, setPatches) {
-  const docsNeedsPublish = placeholders.filter(placeholder => placeholder.needsPublish)
-  const placeholderSummary =
-    docsNeedsPublish.length > 0
+function createSummary(needsPublish, setPatches) {
+  const publishSummary =
+    needsPublish.length > 0
       ? `WARNING: Looks like there are several documents that references drafts which are not yet published. These drafts will need to be published in order to be able to create references to them.
 
-  *** IF YOU CONTINUE, ${docsNeedsPublish.length} DOCUMENTS WILL BE PUBLISHED! ***\n`
+  *** IF YOU CONTINUE, ${needsPublish.length} DOCUMENTS WILL BE PUBLISHED! ***\n`
       : ''
 
   const setPatchesSummary = setPatches
@@ -162,7 +160,7 @@ function createSummary(placeholders, setPatches) {
     }, [])
     .join('\n')
 
-  return [setPatchesSummary, placeholderSummary].filter(Boolean).join('\n')
+  return [setPatchesSummary, publishSummary].filter(Boolean).join('\n')
 }
 
 function showSummaryAndConfirm(summary) {
