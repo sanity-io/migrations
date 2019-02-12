@@ -29,7 +29,7 @@ function promptBackup() {
   return inquirer.prompt([
     {
       name: 'continue',
-      type: 'showSummaryAndConfirm',
+      type: 'confirm',
       default: false,
       message: `Fixing draft references.\n\nBefore doing this migration, make sure you have a backup handy.\n  "sanity dataset export <dataset> <somefile.ndjson>" is an easy way to do this.\n\nWould you like to perform the "fix draft references"-migration on dataset "${targetDataset}"?`,
     },
